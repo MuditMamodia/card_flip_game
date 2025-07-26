@@ -86,7 +86,7 @@ public class detecting_the_card_and_assining_the_name : MonoBehaviour
 
                 identity.cardType = type;
 
-                // ✅ Ensure card_flip_checker is attached
+                //  Ensure card_flip_checker is attached
                 if (card.GetComponent<card_flip_checker>() == null)
                     card.AddComponent<card_flip_checker>();
 
