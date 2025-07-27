@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
+
 public class card_flip_checker : MonoBehaviour
 {
     // Tracks whether the front or back side is currently visible
@@ -14,7 +17,13 @@ public class card_flip_checker : MonoBehaviour
     [Header("Flip Settings")]
     [SerializeField] private float flipDuration = 0.3f;// Duration for flip animation
 
-   
+
+    private void Start()
+    {
+        // Schedule the card to flip to back after 0.5 seconds
+        Invoke(nameof(FlipToBack), 1.5f);
+    }
+
 
     // Flip from back (180° Y) to front (0° Y)
     public void FlipToFront()
@@ -38,6 +47,7 @@ public class card_flip_checker : MonoBehaviour
             StartCoroutine(RotateY(0f, 180f));
             frount_side = false;
             backside_side = true;
+          
         }
         
     }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class mouse_click_to_detect_the_card : MonoBehaviour
 {
@@ -18,6 +19,9 @@ public class mouse_click_to_detect_the_card : MonoBehaviour
 
     private score_and_mach_checker smc;    // Reference to the match checking system
 
+
+    [Header("event for audioplaying")]
+    [SerializeField] private UnityEvent card_flip_event;
 
     // Find the score_and_mach_checker on scene load
     private void Awake()
@@ -45,35 +49,46 @@ public class mouse_click_to_detect_the_card : MonoBehaviour
     {
         while (true)
         {
-            if (Input.GetMouseButtonDown(0)) // Left click
+            Vector2 worldPos = Vector2.zero;
+            bool clicked = false;
+
+            // PC: Mouse Click
+
+            if (Input.GetMouseButtonDown(0))
             {
-                Vector3 mousePos = Input.mousePosition;
-                Vector2 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
+                worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                clicked = true;
+            }
 
-                // Cast a circle in 2D to detect cards
+
+            if (Input.touchCount > 0 && Input.touches[0].phase == TouchPhase.Began)
+            {
+                worldPos = Camera.main.ScreenToWorldPoint(Input.touches[0].position);
+                clicked = true;
+            }
+
+
+            if (clicked)
+            {
                 Collider2D hit = Physics2D.OverlapCircle(worldPos, circleRadius);
-
-                if (hit != null )
+                if (hit != null)
                 {
                     card = hit.GetComponent<card_info_holder>();
-                   
-                    if (card != null && flipped_card_count < 2)
+                    cfc = hit.GetComponent<card_flip_checker>();
+
+                    if (card != null && cfc != null && flipped_card_count < 2)
                     {
-                        Debug.Log($"🃏 2D Hit Card: {hit.gameObject.name} | Type: {card.cardType}");
+                        Debug.Log($"🃏 Card Clicked: {card.cardType}");
+                        card_flipping();
                     }
                     else
                     {
-                        Debug.Log(" click on something identety unidentifyed");
-                    }
-                    cfc = hit.GetComponent<card_flip_checker>();
-                    if (cfc != null)
-                    {
-                        card_flipping();
+                        Debug.Log("Card hit but conditions not met or unidentified.");
                     }
                 }
                 else
                 {
-                    Debug.Log("❌ Nothing hit with 2D circle check.");
+                    Debug.Log("❌ Nothing hit at that point.");
                 }
             }
 
@@ -100,18 +115,23 @@ public class mouse_click_to_detect_the_card : MonoBehaviour
             cfc.frount_side = true;
             cfc.FlipToFront();
             flipped_card_count += 1;
+            card_flip_event.Invoke();
             if (flipped_card_count == 2)
             {
                 smc.mached_chekcer();
             }
         }
-        //else if (cfc.frount_side)
-        //{
-        //    cfc.frount_side = false;
-        //    cfc.FlipToBack();
-        //    flipped_card_count -= 1;
-        //}
+        else if (cfc.frount_side)
+        {
+            cfc.frount_side = false;
+            cfc.FlipToBack();
+            if (flipped_card_count > 0)
+            {
+                flipped_card_count -= 1;
+            }
+            
+        }
 
-        
+
     }
 }
