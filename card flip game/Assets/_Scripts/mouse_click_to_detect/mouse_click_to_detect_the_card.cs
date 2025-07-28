@@ -19,6 +19,8 @@ public class mouse_click_to_detect_the_card : MonoBehaviour
 
     private score_and_mach_checker smc;    // Reference to the match checking system
 
+    public bool canflip;
+
 
     [Header("event for audioplaying")]
     [SerializeField] private UnityEvent card_flip_event;
@@ -27,6 +29,12 @@ public class mouse_click_to_detect_the_card : MonoBehaviour
     private void Awake()
     {
         smc = FindObjectOfType<score_and_mach_checker>();
+    }
+
+
+    private void Start()
+    {
+        Invoke(nameof(hold_at_ferst), 1.5f);
     }
 
     // Start click detection when this component is enabled
@@ -47,53 +55,58 @@ public class mouse_click_to_detect_the_card : MonoBehaviour
     // Coroutine to detect mouse clicks and perform a 2D circle overlap
     IEnumerator DetectMouseClick()
     {
-        while (true)
-        {
-            Vector2 worldPos = Vector2.zero;
-            bool clicked = false;
 
-            // PC: Mouse Click
-
-            if (Input.GetMouseButtonDown(0))
+       
+        
+            while (true)
             {
-                worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                clicked = true;
-            }
+                Vector2 worldPos = Vector2.zero;
+                bool clicked = false;
 
+                // PC: Mouse Click
 
-            if (Input.touchCount > 0 && Input.touches[0].phase == TouchPhase.Began)
-            {
-                worldPos = Camera.main.ScreenToWorldPoint(Input.touches[0].position);
-                clicked = true;
-            }
-
-
-            if (clicked)
-            {
-                Collider2D hit = Physics2D.OverlapCircle(worldPos, circleRadius);
-                if (hit != null)
+                if (Input.GetMouseButtonDown(0))
                 {
-                    card = hit.GetComponent<card_info_holder>();
-                    cfc = hit.GetComponent<card_flip_checker>();
+                    worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    clicked = true;
+                }
 
-                    if (card != null && cfc != null && flipped_card_count < 2)
+
+                if (Input.touchCount > 0 && Input.touches[0].phase == TouchPhase.Began)
+                {
+                    worldPos = Camera.main.ScreenToWorldPoint(Input.touches[0].position);
+                    clicked = true;
+                }
+
+
+                if (clicked)
+                {
+                    Collider2D hit = Physics2D.OverlapCircle(worldPos, circleRadius);
+                    if (hit != null)
                     {
-                        Debug.Log($"🃏 Card Clicked: {card.cardType}");
-                        card_flipping();
+                        card = hit.GetComponent<card_info_holder>();
+                        cfc = hit.GetComponent<card_flip_checker>();
+
+                        if (card != null && cfc != null && flipped_card_count < 2)
+                        {
+                            Debug.Log($"🃏 Card Clicked: {card.cardType}");
+                            card_flipping();
+                        }
+                        else
+                        {
+                            Debug.Log("Card hit but conditions not met or unidentified.");
+                        }
                     }
                     else
                     {
-                        Debug.Log("Card hit but conditions not met or unidentified.");
+                        Debug.Log("❌ Nothing hit at that point.");
                     }
                 }
-                else
-                {
-                    Debug.Log("❌ Nothing hit at that point.");
-                }
-            }
 
-            yield return null;
-        }
+                yield return null;
+            }
+        
+       
     }
 
     // shows the detection circle in Scene view
@@ -109,29 +122,38 @@ public class mouse_click_to_detect_the_card : MonoBehaviour
     // Handles card flipping logic
     void card_flipping()
     {
-        // Flip the card only if it's not already face up and limit to 2 flips
-        if (!cfc.frount_side && flipped_card_count < 2)
+        if (canflip)
         {
-            cfc.frount_side = true;
-            cfc.FlipToFront();
-            flipped_card_count += 1;
-            card_flip_event.Invoke();
-            if (flipped_card_count == 2)
+            // Flip the card only if it's not already face up and limit to 2 flips
+            if (!cfc.frount_side && flipped_card_count < 2)
             {
-                smc.mached_chekcer();
+                cfc.frount_side = true;
+                cfc.FlipToFront();
+                flipped_card_count += 1;
+                card_flip_event.Invoke();
+                if (flipped_card_count == 2)
+                {
+                    smc.mached_chekcer();
+                }
+            }
+            else if (cfc.frount_side)
+            {
+                cfc.frount_side = false;
+                cfc.FlipToBack();
+                if (flipped_card_count > 0)
+                {
+                    flipped_card_count -= 1;
+                }
+
             }
         }
-        else if (cfc.frount_side)
-        {
-            cfc.frount_side = false;
-            cfc.FlipToBack();
-            if (flipped_card_count > 0)
-            {
-                flipped_card_count -= 1;
-            }
             
-        }
 
 
+    }
+
+    public void hold_at_ferst()
+    {
+        canflip = true;
     }
 }

@@ -27,7 +27,27 @@ public class score_and_mach_checker : MonoBehaviour
     public GameObject cards_holder;
     public GameObject ui_canvas_while_playing_game;
     public GameObject UI_canvs_complection_of_game;
+    public bool level_completed;
 
+
+    public int level_id;
+
+    private void Start()
+    {
+        SavedData datasaved = Save_manager.Load_saved_data(level_id);
+        if (datasaved != null)
+        {
+            total_score = datasaved.total_score[level_id];
+            level_completed = datasaved.iscompleted[level_id];
+        }
+        else
+        {
+            total_score = 0;
+            level_completed = false;
+        }
+
+        tmp.text = total_score.ToString();
+    }
 
     // Public method to check if two flipped cards match
     public void mached_chekcer()
@@ -59,7 +79,11 @@ public class score_and_mach_checker : MonoBehaviour
             if (flippedInfo[0].cardType == flippedInfo[1].cardType)
             {
                 // Match found: increase score and mark cards as matched
-                total_score += 1;
+                if (total_score != cfc.Length / 2)
+                {
+                    total_score += 1;
+                }
+               
                 tmp.text = total_score.ToString();
                 tmptwo.text = total_score.ToString();
                 audio_for_matching.Invoke();
@@ -111,6 +135,7 @@ public class score_and_mach_checker : MonoBehaviour
         if (count_for_score_andquit == cfc.Length)
         {
             StartCoroutine(gamecomplection_delaytime());
+            Save_manager.save_level_data(this,level_id);
         }
 
     }
@@ -123,6 +148,9 @@ public class score_and_mach_checker : MonoBehaviour
         ui_canvas_while_playing_game.SetActive(false);
         cards_holder.SetActive(false);
         UI_canvs_complection_of_game.SetActive(true);
+        level_completed = true;
+        
+
     }
 
 }

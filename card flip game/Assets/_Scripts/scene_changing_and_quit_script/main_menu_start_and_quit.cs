@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,6 +9,7 @@ public class main_menu_start_and_quit : MonoBehaviour
     [SerializeField] private GameObject loading_canvas;
     [SerializeField] private GameObject level_selection_canvas;
     [SerializeField] private Image loading_slider;
+   
 
     public void chnage_scene(int scene_id)
     {
@@ -35,4 +37,6 @@ public class main_menu_start_and_quit : MonoBehaviour
             yield return null;
         }
     }
+
+    
 }
