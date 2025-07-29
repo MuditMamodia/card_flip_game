@@ -2189,8 +2189,8 @@ MonoBehaviour:
   cards: []
   number_of_card_in_the_scene: 0
   frount_face_cards:
-  - {fileID: 21300000, guid: 527091c47d21f02419db8c014ec7252d, type: 3}
-  - {fileID: 21300000, guid: 95b2b59167e2d864a9dc59e71f4dcb55, type: 3}
+  - {fileID: 21300000, guid: a9f0d760e47a33a4bb36558fc3937241, type: 3}
+  - {fileID: 21300000, guid: 4af3a7324830c674d9c34240b9f4d14d, type: 3}
 --- !u!4 &1200488021
 Transform:
   m_ObjectHideFlags: 0
@@ -3349,6 +3349,7 @@ MonoBehaviour:
   cfc: {fileID: 0}
   flipped_card_count: 0
   card: {fileID: 0}
+  canflip: 0
   card_flip_event:
     m_PersistentCalls:
       m_Calls:
